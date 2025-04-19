@@ -2,6 +2,8 @@ package xingchen.xingchenPlayerInfo;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 public final class XingchenPlayerInfo extends JavaPlugin {
     public static JavaPlugin instance;
 
@@ -11,7 +13,7 @@ public final class XingchenPlayerInfo extends JavaPlugin {
         saveDefaultConfig();
         DatabaseManager dbManager = new DatabaseManager(getConfig(), getDataFolder());
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(dbManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuitListener(dbManager), this);
+        Objects.requireNonNull(getServer().getPluginManager()).registerEvents(new PlayerQuitListener(dbManager), this);
         getCommand("playerinfo").setExecutor(new PlayerInfoCommand(dbManager));
         getLogger().info("XingchenPlayerInfo插件加载成功");
     }

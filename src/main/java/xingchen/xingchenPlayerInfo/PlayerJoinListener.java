@@ -31,7 +31,7 @@ public class PlayerJoinListener implements Listener {
         // 记录玩家登录时间
         loginTimes.put(name, now);
         // 检查玩家是否已有记录
-        DatabaseManager.PlayerData existingData = null;
+        DatabaseManager.PlayerData existingData;
         try {
             existingData = dbManager.getPlayerDataByName(name);
         } catch (Exception e) {

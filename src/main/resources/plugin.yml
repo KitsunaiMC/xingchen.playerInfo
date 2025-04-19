@@ -1,0 +1,8 @@
+name: xingchen.PlayerInfo
+version: '1.0-SNAPSHOT'
+main: xingchen.xingchenPlayerInfo.XingchenPlayerInfo
+api-version: '1.21'
+commands:
+  playerinfo:
+    description: 查询玩家的登录信息
+    usage: /<command> <playerUUID>

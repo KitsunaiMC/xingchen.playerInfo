@@ -33,6 +33,7 @@ public final class XingchenPlayerInfo extends JavaPlugin {
             @Override
             public void run() {
                 SaveAllPlayersOnlineTime();
+                getLogger().info("保存所有玩家的在线时间成功");
             }
         }.runTaskTimerAsynchronously(this, 60 * 20L, saveInterval * 60 * 20L); // 60秒后开始
     }
@@ -40,42 +41,28 @@ public final class XingchenPlayerInfo extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Bukkit.getScheduler().cancelTask(saveTaskId);
         SaveAllPlayersOnlineTime();
-        getLogger().info("XingchenPlayerInfo插件卸载成功");
     }
 
     private void SaveAllPlayersOnlineTime() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             String name = player.getName();
             Timestamp now = Timestamp.from(Instant.now());
-
-            Timestamp loginTime = PlayerJoinListener.getLoginTime(name);
+            Timestamp loginTime = LoginTimeMap.getLoginTime(name);
             if (loginTime != null) {
-                updateOnlineTime(name, now, loginTime);
-                PlayerJoinListener.setLoginTime(name, now);
-                getLogger().info("保存玩家在线时间成功");
+                long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
+                DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
+                if (existingData != null) {
+                    long updatedTotal = existingData.totalOnlineTime + onlineTime;
+                    dbManager.updatePlayerOnlineTime(name, updatedTotal);
+                    LoginTimeMap.setLoginTime(name, now);
+                    getLogger().info("保存玩家"+name+"本次在线时间"+onlineTime+"总在线时间"+updatedTotal);
+                } else {
+                    getLogger().warning("玩家"+name+"无法更新在线时间");
+                }
             } else {
-                logger.warn("玩家 {} 的登录时间未记录，无法计算在线时间", name);
+                getLogger().warning("玩家"+name+"的登录时间未记录，无法计算在线时间");
             }
-        }
-    }
-
-    private void updateOnlineTime(String name, Timestamp now, Timestamp loginTime) {
-        // 计算玩家本次在线时间（秒）
-        if (loginTime == null) {
-            logger.error("玩家 {} 的登录时间为空，无法计算在线时间", name);
-            return;
-        }
-        long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
-        logger.debug("玩家 {} 的登录时间: {}, 当前时间: {}, 计算出的在线时间: {} 秒", name, loginTime, now, onlineTime);
-        DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
-        if (existingData != null) {
-            long updatedTotal = existingData.totalOnlineTime + onlineTime;
-            logger.debug("玩家 {} 本次在线: {} 秒，总时长更新为: {} 秒", name, onlineTime, updatedTotal);
-            dbManager.updatePlayerOnlineTime(name, updatedTotal);
-        } else {
-            logger.warn("玩家 {} 的数据不存在，无法更新在线时间", name);
         }
     }
 }

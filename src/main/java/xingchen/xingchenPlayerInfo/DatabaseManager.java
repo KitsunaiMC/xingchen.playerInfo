@@ -33,7 +33,7 @@ public class DatabaseManager {
             stmt.execute(createTableSQL);
             stmt.execute(createIndexSQL);
         } catch (SQLException e) {
-            e.printStackTrace();
+            XingchenPlayerInfo.instance.getLogger().warning("创建数据库表失败: ");
         }
     }
 
@@ -55,7 +55,7 @@ public class DatabaseManager {
             stmt.setString(6, ip);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            XingchenPlayerInfo.instance.getLogger().warning("记录玩家登录信息失败: ");
         }
     }
 
@@ -80,7 +80,7 @@ public class DatabaseManager {
     }
 
     public PlayerData getPlayerDataByName(String name) {
-        String selectSQL = "SELECT uuid, name, first_join, last_join, login_count, total_online_time, last_ip FROM player_logins WHERE name = ? COLLATE NOCASE";
+        String selectSQL = "SELECT uuid, name, first_join, last_join, login_count, total_online_time, last_ip FROM player_logins WHERE name = ?";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(selectSQL)) {
             stmt.setString(1, name);
             ResultSet rs = stmt.executeQuery();
@@ -96,7 +96,7 @@ public class DatabaseManager {
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            XingchenPlayerInfo.instance.getLogger().warning("查询玩家数据失败: ");
         }
         return null;
     }
@@ -109,7 +109,7 @@ public class DatabaseManager {
             stmt.setString(2, name);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            XingchenPlayerInfo.instance.getLogger().warning("更新玩家在线时间失败: ");
         }
     }
 }

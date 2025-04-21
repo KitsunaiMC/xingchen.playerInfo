@@ -7,16 +7,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PlayerJoinListener implements Listener {
     private final DatabaseManager dbManager;
-    private static final Map<String, Timestamp> loginTimes = new ConcurrentHashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(PlayerJoinListener.class);
 
     public PlayerJoinListener(DatabaseManager dbManager) {
         this.dbManager = dbManager;
@@ -28,12 +21,12 @@ public class PlayerJoinListener implements Listener {
         String name = event.getPlayer().getName();
         String ip = Objects.requireNonNull(event.getPlayer().getAddress()).getHostName();
         Timestamp now = Timestamp.from(Instant.now());
-        loginTimes.put(name, now);
+        LoginTimeMap.loginTimes.put(name, now);
         DatabaseManager.PlayerData existingData;
         try {
             existingData = dbManager.getPlayerDataByName(name);
         } catch (Exception e) {
-            logger.error("获取玩家数据失败: " + name, e);
+            XingchenPlayerInfo.instance.getLogger().warning("获取"+name+"玩家数据失败:");
             return;
         }
         int loginCount = 1;
@@ -43,23 +36,14 @@ public class PlayerJoinListener implements Listener {
             firstJoin = existingData.firstJoin;
         }
         try {
-            dbManager.recordPlayerLogin(uuid, name, firstJoin, now, loginCount, ip); // 修改: 传递正确的 loginCount
+            dbManager.recordPlayerLogin(uuid, name, firstJoin, now, loginCount, ip);
         } catch (Exception e) {
-            logger.error("记录玩家登录信息失败: " + name, e);
+            XingchenPlayerInfo.instance.getLogger().warning("记录玩家登录信息失败: ");
             return;
         }
-        logger.debug("玩家 {} 登录，lastJoin 更新为: {}", name, now);
+        XingchenPlayerInfo.instance.getLogger().info("玩家"+name+"登录，lastJoin 更新为:"+now);
     }
 
-    public static Timestamp getLoginTime(String name) {
-        return loginTimes.get(name);
-    }
 
-    public static void removeLoginTime(String name) {
-        loginTimes.remove(name);
-    }
 
-    public static void setLoginTime(String name, Timestamp loginTime) {
-        loginTimes.put(name, loginTime);
-    }
 }

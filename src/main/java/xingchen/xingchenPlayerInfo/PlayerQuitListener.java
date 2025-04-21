@@ -23,30 +23,31 @@ public class PlayerQuitListener implements Listener {
         String name = event.getPlayer().getName();
         Timestamp now = Timestamp.from(Instant.now());
 
-        Timestamp loginTime = PlayerJoinListener.getLoginTime(name);
+        Timestamp loginTime = LoginTimeMap.getLoginTime(name);
 
         if (loginTime == null) {
-            logger.warn("玩家 {} 的登录时间未记录，无法计算在线时间", name);
+            XingchenPlayerInfo.instance.getLogger().warning("玩家 " + name + " 的登录时间未记录，无法计算在线时间");
             return;
         }
-        updateOnlineTime(name, now, loginTime);
-        PlayerJoinListener.removeLoginTime(name);
+        updateOnlineTime(name, now, loginTime, dbManager);
+        LoginTimeMap.removeLoginTime(name);
     }
 
-    private void updateOnlineTime(String name, Timestamp now, Timestamp loginTime) {
+    public void updateOnlineTime(String name, Timestamp now, Timestamp loginTime, DatabaseManager dbManager) {
         if (loginTime == null) {
-            logger.error("玩家 {} 的登录时间为空，无法计算在线时间", name);
+            XingchenPlayerInfo.instance.getLogger().warning("玩家"+name+"的登录时间为空，无法计算在线时间");
             return;
         }
         long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
-        logger.debug("玩家 {} 的登录时间: {}, 当前时间: {}, 计算出的在线时间: {} 秒", name, loginTime, now, onlineTime);
+        XingchenPlayerInfo.instance.getLogger().info("玩家"+name+"的登录时间为 "+loginTime+"，退出时间为 "+now+"，本次在线"+onlineTime+"秒");
         DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
         if (existingData != null) {
             long updatedTotal = existingData.totalOnlineTime + onlineTime;
-            logger.debug("玩家 {} 本次在线: {} 秒，总时长更新为: {} 秒", name, onlineTime, updatedTotal);
+            XingchenPlayerInfo.instance.getLogger().info("玩家 "+name+" 本次在线: "+onlineTime+" 秒，总时长更新为:"+updatedTotal+"秒");
             dbManager.updatePlayerOnlineTime(name, updatedTotal);
+            LoginTimeMap.removeLoginTime(name);
         } else {
-            logger.warn("玩家 {} 的数据不存在，无法更新在线时间", name);
+            XingchenPlayerInfo.instance.getLogger().warning("玩家"+name+"的数据不存在，无法更新在线时间");
         }
     }
 }

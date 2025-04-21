@@ -28,9 +28,7 @@ public class PlayerJoinListener implements Listener {
         String name = event.getPlayer().getName();
         String ip = Objects.requireNonNull(event.getPlayer().getAddress()).getHostName();
         Timestamp now = Timestamp.from(Instant.now());
-        // 记录玩家登录时间
         loginTimes.put(name, now);
-        // 检查玩家是否已有记录
         DatabaseManager.PlayerData existingData;
         try {
             existingData = dbManager.getPlayerDataByName(name);
@@ -38,29 +36,23 @@ public class PlayerJoinListener implements Listener {
             logger.error("获取玩家数据失败: " + name, e);
             return;
         }
-        int loginCount = 1; // 修改: 默认值为 1
+        int loginCount = 1;
         Timestamp firstJoin = now;
         if (existingData != null) {
-            loginCount = existingData.loginCount + 1; // 修改: 递增登录次数
+            loginCount = existingData.loginCount + 1;
             firstJoin = existingData.firstJoin;
         }
-
-        // 记录或更新玩家数据
         try {
             dbManager.recordPlayerLogin(uuid, name, firstJoin, now, loginCount, ip); // 修改: 传递正确的 loginCount
         } catch (Exception e) {
             logger.error("记录玩家登录信息失败: " + name, e);
             return;
         }
-
-        // 调试日志：打印玩家登录信息
         logger.debug("玩家 {} 登录，lastJoin 更新为: {}", name, now);
     }
-
     public static Timestamp getLoginTime(String name) {
         return loginTimes.get(name);
     }
-
     public static void removeLoginTime(String name) {
         loginTimes.remove(name);
     }

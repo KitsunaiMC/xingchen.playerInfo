@@ -32,6 +32,7 @@ public class PlayerQuitListener implements Listener {
                 long updatedTotal = existingData.totalOnlineTime + onlineTime;
                 logger.debug("玩家 {} 登出，本次在线: {} 秒，总时长更新为: {} 秒", name, onlineTime, updatedTotal);
                 dbManager.updatePlayerOnlineTime(name, updatedTotal);
+                PlayerJoinListener.removeLoginTime(name);
             } else {
                 logger.warn("玩家 {} 的数据不存在，无法更新在线时间", name);
             }

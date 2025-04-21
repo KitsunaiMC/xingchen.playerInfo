@@ -11,7 +11,6 @@ public class PlayerInfoCommand implements CommandExecutor {
         this.dbManager = dbManager;
     }
     private String formatDuration(long seconds) {
-        //将数据库中的"秒"计时改为"时:分:秒"
         long hrs = seconds / 3600;
         long mins = (seconds % 3600) / 60;
         long secs = seconds % 60;

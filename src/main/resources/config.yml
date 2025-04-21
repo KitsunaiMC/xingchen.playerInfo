@@ -1,2 +1,3 @@
 database:
   file: playerdata.db
+  save-interval: 15

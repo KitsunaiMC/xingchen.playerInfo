@@ -9,11 +9,8 @@ public class DatabaseManager {
     private final String url;
 
     public DatabaseManager(FileConfiguration config, File dataFolder) {
-        // SQLite 数据库文件路径
         this.url = "jdbc:sqlite:" + dataFolder.getAbsolutePath() + File.separator +
                 config.getString("database.file", "playerdata.db");
-
-        // 初始化数据库表
         initDatabase();
     }
 

@@ -21,7 +21,7 @@ public class PlayerJoinListener implements Listener {
         String name = event.getPlayer().getName();
         String ip = Objects.requireNonNull(event.getPlayer().getAddress()).getHostName();
         Timestamp now = Timestamp.from(Instant.now());
-        LoginTimeMap.loginTimes.put(name, now);
+        LoginTimeMap.setLoginTime(name,now);
         DatabaseManager.PlayerData existingData;
         try {
             existingData = dbManager.getPlayerDataByName(name);

@@ -60,4 +60,8 @@ public class PlayerJoinListener implements Listener {
     public static Timestamp getLoginTime(String name) {
         return loginTimes.get(name);
     }
+
+    public static void removeLoginTime(String name) {
+        loginTimes.remove(name);
+    }
 }

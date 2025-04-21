@@ -25,19 +25,28 @@ public class PlayerQuitListener implements Listener {
 
         Timestamp loginTime = PlayerJoinListener.getLoginTime(name);
 
-        if (loginTime != null) {
-            long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
-            DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
-            if (existingData != null) {
-                long updatedTotal = existingData.totalOnlineTime + onlineTime;
-                logger.debug("玩家 {} 登出，本次在线: {} 秒，总时长更新为: {} 秒", name, onlineTime, updatedTotal);
-                dbManager.updatePlayerOnlineTime(name, updatedTotal);
-                PlayerJoinListener.removeLoginTime(name);
-            } else {
-                logger.warn("玩家 {} 的数据不存在，无法更新在线时间", name);
-            }
-        } else {
+        if (loginTime == null) {
             logger.warn("玩家 {} 的登录时间未记录，无法计算在线时间", name);
+            return;
+        }
+        updateOnlineTime(name, now, loginTime);
+        PlayerJoinListener.removeLoginTime(name);
+    }
+
+    private void updateOnlineTime(String name, Timestamp now, Timestamp loginTime) {
+        if (loginTime == null) {
+            logger.error("玩家 {} 的登录时间为空，无法计算在线时间", name);
+            return;
+        }
+        long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
+        logger.debug("玩家 {} 的登录时间: {}, 当前时间: {}, 计算出的在线时间: {} 秒", name, loginTime, now, onlineTime);
+        DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
+        if (existingData != null) {
+            long updatedTotal = existingData.totalOnlineTime + onlineTime;
+            logger.debug("玩家 {} 本次在线: {} 秒，总时长更新为: {} 秒", name, onlineTime, updatedTotal);
+            dbManager.updatePlayerOnlineTime(name, updatedTotal);
+        } else {
+            logger.warn("玩家 {} 的数据不存在，无法更新在线时间", name);
         }
     }
 }

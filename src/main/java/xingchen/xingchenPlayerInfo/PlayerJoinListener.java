@@ -50,10 +50,16 @@ public class PlayerJoinListener implements Listener {
         }
         logger.debug("玩家 {} 登录，lastJoin 更新为: {}", name, now);
     }
+
     public static Timestamp getLoginTime(String name) {
         return loginTimes.get(name);
     }
+
     public static void removeLoginTime(String name) {
         loginTimes.remove(name);
+    }
+
+    public static void setLoginTime(String name, Timestamp loginTime) {
+        loginTimes.put(name, loginTime);
     }
 }

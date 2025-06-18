@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven-publish'
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -16,6 +17,31 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+}
+
+tasks.register('apiJar', Jar) {
+    archiveClassifier = 'api'
+
+    from(sourceSets.main.output) {
+        include 'xingchen/xingchenPlayerInfo/api/**'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact apiJar
+            artifactId = 'xingchenPlayerInfo-api'
+        }
+    }
+
+    repositories {
+        maven { url = layout.buildDirectory.dir("../repo") }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
 }
 
 dependencies {

@@ -1,5 +1,6 @@
 package xingchen.xingchenPlayerInfo;
 
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,14 +10,21 @@ import java.time.Instant;
 import java.util.Objects;
 
 import org.bukkit.scheduler.BukkitRunnable;
+import xingchen.xingchenPlayerInfo.api.PlayerInfoAPI;
 
-public final class XingchenPlayerInfo extends JavaPlugin {
+public final class XingchenPlayerInfo extends JavaPlugin implements PlayerInfoAPI {
     public static JavaPlugin instance;
     private DatabaseManager dbManager;
 
     @Override
     public void onEnable() {
         instance = this;
+        Bukkit.getServicesManager().register(
+                PlayerInfoAPI.class,
+                this,
+                this,
+                ServicePriority.Normal
+        );
         saveDefaultConfig();
         dbManager = new DatabaseManager(getConfig(), getDataFolder());
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(dbManager), this);
@@ -61,5 +69,11 @@ public final class XingchenPlayerInfo extends JavaPlugin {
                 getLogger().warning("玩家 " + name + " 的登录时间未记录，无法计算在线时间,loginTime为空!");
             }
         }
+    }
+
+    @Override
+    public boolean isNewComer(Player player) {
+        DatabaseManager.PlayerData data = dbManager.getPlayerDataByName(player.getName());
+        return data.firstJoin.equals(data.lastJoin);
     }
 }

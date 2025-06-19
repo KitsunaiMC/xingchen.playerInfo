@@ -29,7 +29,6 @@ public final class XingchenPlayerInfo extends JavaPlugin {
             @Override
             public void run() {
                 SaveAllPlayersOnlineTime();
-                getLogger().info("保存所有玩家的在线时间成功");
             }
         }.runTaskTimerAsynchronously(this, 60 * 20L, saveInterval * 60 * 20L); // 60秒后开始
     }
@@ -53,9 +52,8 @@ public final class XingchenPlayerInfo extends JavaPlugin {
                     long updatedTotal = existingData.totalOnlineTime + onlineTime; // 更新总在线时间
                     dbManager.updatePlayerOnlineTime(name, updatedTotal);
                     lastSaveTime.setLoginTime(name, now); // 更新登录时间为当前时间
-                    getLogger().info("保存玩家 " + name + " 本次在线时间 " + onlineTime + " 秒，总在线时间 " + updatedTotal + " 秒");
                 } else {
-                    getLogger().warning("玩家 " + name + " 无法更新在线时间,数据库返回数据为空!");
+                    getLogger().warning("玩家 " + name + " 无法更新在线时间,数据库返回总时长为空!");
                 }
             } else {
                 getLogger().warning("玩家 " + name + " 的登录时间未记录，无法计算在线时间,loginTime为空!");

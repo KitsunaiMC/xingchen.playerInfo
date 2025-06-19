@@ -19,10 +19,11 @@ public class DatabaseManager {
     }
 
     private void initDatabase() {
+        String firstJoin = "first_join";
         String createTableSQL = "CREATE TABLE IF NOT EXISTS player_logins (" +
                 "name TEXT PRIMARY KEY," +
                 "uuid TEXT NOT NULL," +
-                "first_join DATETIME NOT NULL," +
+                firstJoin + " DATETIME NOT NULL," +
                 "last_join DATETIME NOT NULL," +
                 "login_count INTEGER NOT NULL," +
                 "total_online_time INTEGER NOT NULL DEFAULT 0," +
@@ -102,7 +103,7 @@ public class DatabaseManager {
     }
 
     public void updatePlayerOnlineTime(String name, long additionalOnlineTime) {
-        String updateSQL = "UPDATE player_logins SET total_online_time = total_online_time + ? WHERE name = ?";
+        String updateSQL = "UPDATE player_logins SET total_online_time = ? WHERE name = ?";
 
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(updateSQL)) {
             stmt.setLong(1, additionalOnlineTime);

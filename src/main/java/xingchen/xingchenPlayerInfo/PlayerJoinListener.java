@@ -39,9 +39,7 @@ public class PlayerJoinListener implements Listener {
             dbManager.recordPlayerLogin(uuid, name, firstJoin, now, loginCount, ip);
         } catch (Exception e) {
             XingchenPlayerInfo.instance.getLogger().warning("记录玩家登录信息失败: ");
-            return;
         }
-        XingchenPlayerInfo.instance.getLogger().info("玩家"+name+"登录，lastJoin 更新为:"+now);
     }
 
 

@@ -37,11 +37,9 @@ public class PlayerQuitListener implements Listener {
             return;
         }
         long onlineTime = (now.getTime() - loginTime.getTime()) / 1000;
-        XingchenPlayerInfo.instance.getLogger().info("玩家"+name+"的登录时间为 "+loginTime+"，退出时间为 "+now+"，本次在线"+onlineTime+"秒");
         DatabaseManager.PlayerData existingData = dbManager.getPlayerDataByName(name);
         if (existingData != null) {
             long updatedTotal = existingData.totalOnlineTime + onlineTime;
-            XingchenPlayerInfo.instance.getLogger().info("玩家 "+name+" 本次在线: "+onlineTime+" 秒，总时长更新为:"+updatedTotal+"秒");
             dbManager.updatePlayerOnlineTime(name, updatedTotal);
             lastSaveTime.removeLoginTime(name);
         } else {
